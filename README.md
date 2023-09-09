@@ -1,2 +1,2 @@
 # MouseMover
-VBA Automation to auto move mouse
+VBA Automation to auto move cursor
