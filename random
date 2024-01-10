@@ -1,0 +1,59 @@
+String parseCron(String cronExpression) {
+    def cronParts = cronExpression.split()
+
+    // Mapping cron fields to their respective ranges and special characters
+    def fieldSpecs = [
+        minutes: [0..59, '*/,-'],
+        hours: [0..23, '*/,-'],
+        dayOfMonth: [1..31, '*/,-'],
+        month: [1..12, '*/,-'],
+        dayOfWeek: [0..7, 'SUN,MON,TUE,WED,THU,FRI,SAT']
+    ]
+
+    // Initialize result list for valid days
+    def validDays = []
+
+    // Iterate over cron fields
+    for (int i = 0; i < cronParts.size(); i++) {
+        def field = cronParts[i]
+        def [range, specialChars] = fieldSpecs[field]
+
+        // Check if field contains a special character
+        if (field.any { specialChars.contains(it) }) {
+            // Iterate over the range and add valid values to the result list
+            range.each { value ->
+                if (isValid(field, value, cronParts)) {
+                    validDays.add(value)
+                }
+            }
+        } else {
+            // If no special characters, directly add the field value
+            validDays.add(field as int)
+        }
+    }
+
+    // Convert the list to a comma-separated string
+    return validDays.join(',')
+}
+
+boolean isValid(String field, int value, List<String> cronParts) {
+    // Validate the cron expression based on the custom logic
+    // You can customize this logic further based on your requirements
+    // Currently, it checks if the value is divisible by 2 or 3
+
+    switch (field) {
+        case 'minutes':
+        case 'hours':
+        case 'dayOfMonth':
+        case 'month':
+        case 'dayOfWeek':
+            return value % 2 == 0 || value % 3 == 0
+        default:
+            return false
+    }
+}
+
+// Example usage
+def cronExpression = "*/5 3,6 10-15 JAN,FEB MON-FRI" // Replace with your cron expression
+def validDays = parseCron(cronExpression)
+println("Valid Days: $validDays")
