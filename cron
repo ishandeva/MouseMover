@@ -1,0 +1,25 @@
+@Grab(group='com.cronutils', module='cron-utils', version='9.1')
+
+import com.cronutils.model.Cron
+import com.cronutils.model.definition.CronDefinitionBuilder
+import com.cronutils.parser.CronParser
+import com.cronutils.model.time.ExecutionTime
+import java.time.ZonedDateTime
+
+class CronParserExample {
+    static ZonedDateTime calculateNextExecution(String cronExpression) {
+        def cronParser = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronDefinitionBuilder.Style.QUARTZ))
+        def cron = cronParser.parse(cronExpression)
+        def now = ZonedDateTime.now()
+
+        def executionTime = ExecutionTime.forCron(cron)
+        def nextExecution = executionTime.nextExecution(now)
+
+        return nextExecution
+    }
+}
+
+// Example usage
+def cronExpression = "0 0 12 * * ?" // Replace with your cron expression
+def nextExecution = CronParserExample.calculateNextExecution(cronExpression)
+println("Next execution time: ${nextExecution}")
